@@ -96,7 +96,7 @@ void make_scene2(Scene* scene, Camera* &camera){
 
 void make_scene3(Scene* scene, Camera* &camera){
     Mesh* mesh = new Mesh();
-    mesh->read("arma.obj", Vec3f(7, 7, 7), Vec3f(2, -2, 7));
+    mesh->read("arma.obj", Vec3f(7, 7, -7), Vec3f(2, -2, 7));
     mesh->set_material(new SimpleMaterial(
         new PhongBRDF(new ConstantTexture(Vec3f(0.75, 0.75, 0.25)))
     ));

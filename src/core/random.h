@@ -25,16 +25,16 @@ public:
         return res.norm();
     }
 
-    Ray sample_disk(const Vector &center, double r, const Vector &norm) {
+    Ray sample_disk(const Vec3f &center, double r, const Vec3f &norm) {
         double r0 = sqrt(get());
-        double r1 = get() * (2.0 * pi);
+        double r1 = get() * (2.0 * PI);
         double rx = r * r0 * cos(r1);
         double ry = r * r0 * sin(r1);
 
-        Vector w = norm;
-        Vector wo = w.x < -0.1 || w.x > 0.1 ? Vec3f::Y_AXIS : Vec3f::X_AXIS;
-        Vector u = cross(wo, w).norm();
-        Vector v = cross(w, u);
+        Vec3f w = norm;
+        Vec3f wo = w.x < -0.1 || w.x > 0.1 ? Vec3f::Y_AXIS : Vec3f::X_AXIS;
+        Vec3f u = cross(wo, w).norm();
+        Vec3f v = cross(w, u);
 
         Ray result;
         result.origin = center + u * rx + v * ry;

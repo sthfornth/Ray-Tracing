@@ -106,8 +106,8 @@ void make_scene3(Scene* scene, Camera* &camera){
 
 int main()
 {
-
-	Camera* camera = new Camera();
+	// Camera* camera = new Camera();
+    Camera* camera = new DoFCamera();
     Scene* scene = new Scene();
     make_scene0(scene, camera);
 	make_scene3(scene, camera);

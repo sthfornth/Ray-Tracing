@@ -137,5 +137,42 @@ public:
     }
 };
 
+class Sphere: public Object
+{
+public:
+    Sphere(const Vec3f& center, double radius): center(center), radius(radius){
+        sqrrad = radius * radius;
+    }
+    Sphere(double x, double y, double z, double r) {
+        center.x = x, center.y = y, center.z = z;
+        radius = r, sqrrad = r * r;
+    }
+    Vec3f center;
+    double radius;
+    double sqrrad;
+    virtual Intersection intersect(const Ray& ray){
+        Vec3f v = center - ray.origin;
+        double b = dot(v, ray.direct);
+        double det = b * b - v.L2Norm_Sqr() + sqrrad;
+        if (det > 0) {
+            double sdet = sqrt(det);
+            double distance = 0;
+            if (b - sdet > EPS)
+                distance = b - sdet;
+            else if (b + sdet > EPS)
+                distance = b + sdet;
+            if (distance > EPS) {
+                Intersection res;
+                res.object = static_cast<Object *>(this);
+                res.distance = distance;
+                res.position = ray.get(distance);
+                res.norm = (res.position - center).norm();
+                return res;
+            }
+        }
+        return Intersection::null;
+    }
+
+};
 
 #endif

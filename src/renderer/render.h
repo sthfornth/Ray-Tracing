@@ -52,18 +52,11 @@ public:
 				Vec3f color;
 				for (int t = 0; t < Times; ++ t)
 					color += trace(ray, 10, rng);
-				// if (color.L2Norm_Sqr() > 0.1){
-				// 	printf("%d %d\n", i , j);
-				// 	color.prt();
-				// }
 				canvas->set(i, j, color / Times);
 			}
 	}
 	Vec3f trace(const Ray& ray, int depth, RandomStream* rng){
 		depth --;
-		// if (depth < 8){
-		// 	printf("%d\n", depth);
-		// }
 		Intersection inter = scene->intersect(ray);
 		if (depth < 0 || inter.distance < EPS || inter.distance >= INF){
 			return Vec3f::ZERO;
@@ -71,8 +64,6 @@ public:
 		Object* obj = inter.object;
 		Vec3f pos = inter.position;
 		Vec3f norm = inter.norm;
-		// pos.prt();
-		// printf("%d\n", obj->is_light);
 		Ray out;
 		double pdf;
 		Vec3f res;
@@ -84,11 +75,6 @@ public:
 		BSDF* bsdf = obj->material->get_bsdf(pos, norm);
 		bsdf->sample(ray, pos, norm, rng, out, pdf);
 		res = trace(out, depth, rng);
-		// puts("-----------------");
-		// pos.prt();
-		// norm.prt();
-		// ray.prt();
-		// out.prt();
 		res /= pdf;
 		return res * bsdf->get_reflectance(pos, norm);
 	}

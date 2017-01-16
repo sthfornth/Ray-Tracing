@@ -8,6 +8,7 @@
 class Camera
 {
 public:
+	Camera(){}
 	Camera(const Vec3f &e, const Vec3f &f, const Vec3f &u, double fov_)
 		:eye(e), front(f), up(u)
 		{

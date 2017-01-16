@@ -83,10 +83,11 @@ public:
 
     virtual void sample(const Ray &in, const Vec3f &pos, const Vec3f &norm, RandomStream *rng,
                         Ray &out, double &pdf) const override {
-
+        // puts("-----------");
         out.origin = pos;
         out.direct = reflect(in.direct, norm);
         pdf = 1;
+        // out.prt();
     }
 
     virtual BSDFType get_type() const override { return BSDFType::Specular; }
@@ -123,96 +124,96 @@ private:
     int _coeff;
 };
 
-// class RefractiveBTDF : public BSDF {
-// public:
-//     RefractiveBTDF(Vec3fTexture *const reflectance, double beta = 1.5) : BSDF(reflectance), _beta(beta) {
+class RefractiveBTDF : public BSDF {
+public:
+    RefractiveBTDF(Texture *const reflectance, double beta = 1.5) : BSDF(reflectance), _beta(beta) {
 
-//     }
+    }
 
-//     virtual inline void sample(const Ray &in, const Vec3f &pos, const Vector &norm, RandomStream *rng,
-//                         Ray &out, double &pdf) const override {
+    virtual inline void sample(const Ray &in, const Vec3f &pos, const Vec3f &norm, RandomStream *rng,
+                        Ray &out, double &pdf) const override {
 
-//         sample(in, pos, norm, rng, out, pdf, 0);
-//     }
+        sample(in, pos, norm, rng, out, pdf, 0);
+    }
 
-//     virtual void sample(const Ray &in, const Vector &pos, const Vector &norm, RandomStream *rng,
-//                         Ray &out, double &pdf, int next_id) const {
+    virtual void sample(const Ray &in, const Vec3f &pos, const Vec3f &norm, RandomStream *rng,
+                        Ray &out, double &pdf, int next_id) const {
 
-//         Vector abs_norm = (dot(norm, in.direct) < 0) ? norm : norm * -1;
-//         bool   into = dot(norm, abs_norm) > 0;
-//         double alpha = 1, beta = _beta;
-//         double nnt = into ? alpha / beta : beta / alpha;
-//         double ddn = dot(in.direct, abs_norm);
-//         double cos2t = 1 - nnt * nnt * (1 - ddn * ddn);
+        Vec3f abs_norm = (dot(norm, in.direct) < 0) ? norm : norm * -1;
+        bool   into = dot(norm, abs_norm) > 0;
+        double alpha = 1, beta = _beta;
+        double nnt = into ? alpha / beta : beta / alpha;
+        double ddn = dot(in.direct, abs_norm);
+        double cos2t = 1 - nnt * nnt * (1 - ddn * ddn);
 
-//         Vector d_refl = in.direct - norm * 2 * dot(norm, in.direct);
+        Vec3f d_refl = in.direct - norm * 2 * dot(norm, in.direct);
 
-//         out.origin = pos;
-//         if (cos2t < 0) {
-//             if (next_id == 0 || next_id == 1) {
-//                 out.direct = d_refl;
-//                 pdf = 1;
-//             } else {
-//                 pdf = 0;
-//             }
+        out.origin = pos;
+        if (cos2t < 0) {
+            if (next_id == 0 || next_id == 1) {
+                out.direct = d_refl;
+                pdf = 1;
+            } else {
+                pdf = 0;
+            }
 
-//         } else {
-//             Vector d_refr = (in.direct * nnt - norm * ((into ? 1 : -1) * (ddn * nnt + sqrt(cos2t)))).norm();
+        } else {
+            Vec3f d_refr = (in.direct * nnt - norm * ((into ? 1 : -1) * (ddn * nnt + sqrt(cos2t)))).norm();
 
-//             double a = beta - alpha, b = beta + alpha;
-//             double R0 = sqr(a) / sqr(b);
-//             double c = 1 - (into ? -ddn : dot(norm, d_refr));
-//             double Re = R0 + (1 - R0) * (c * c * c * c * c);
-//             double Tr = 1 - Re;
-//             double P = 0.25 + 0.5 * Re;
+            double a = beta - alpha, b = beta + alpha;
+            double R0 = sqrt(a) / sqrt(b);
+            double c = 1 - (into ? -ddn : dot(norm, d_refr));
+            double Re = R0 + (1 - R0) * (c * c * c * c * c);
+            double Tr = 1 - Re;
+            double P = 0.25 + 0.5 * Re;
 
-//             if (next_id == 0) {
-//                 if (rng->get() < P) {
-//                     out.direct = d_refl;
-//                     pdf = P / Re;
-//                 } else {
-//                     out.direct = d_refr;
-//                     pdf = (1 - P) / Tr;
-//                 }
-//             } else if (next_id == 1) {
-//                 out.direct = d_refl;
-//                 pdf = Re;
-//             } else if (next_id == 2) {
-//                 out.direct = d_refr;
-//                 pdf = Tr;
-//             }
-//         }
-//     }
+            if (next_id == 0) {
+                if (rng->get() < P) {
+                    out.direct = d_refl;
+                    pdf = P / Re;
+                } else {
+                    out.direct = d_refr;
+                    pdf = (1 - P) / Tr;
+                }
+            } else if (next_id == 1) {
+                out.direct = d_refl;
+                pdf = Re;
+            } else if (next_id == 2) {
+                out.direct = d_refr;
+                pdf = Tr;
+            }
+        }
+    }
 
-//     virtual BSDFType get_type() const override { return BSDFType::Refractive; }
+    virtual BSDFType get_type() const override { return BSDFType::Refractive; }
 
-// private:
-//     double _beta;
-// };
+private:
+    double _beta;
+};
 
-// class LambertianSpecularBSDF : public BSDF {
-// public:
-//     LambertianSpecularBSDF(VectorTexture *const reflectance, double diff) : BSDF(reflectance), _diff(diff) { }
+class LambertianSpecularBSDF : public BSDF {
+public:
+    LambertianSpecularBSDF(Texture *const reflectance, double diff) : BSDF(reflectance), _diff(diff) { }
 
-//     virtual void sample(const Ray &in, const Vector &pos, const Vector &norm, RandomStream *rng,
-//                         Ray &out, double &pdf) const override {
+    virtual void sample(const Ray &in, const Vec3f &pos, const Vec3f &norm, RandomStream *rng,
+                        Ray &out, double &pdf) const override {
 
-//         if (rng->get() < _diff) {
-//             Vector abs_norm = (dot(norm, in.direct) < 0) ? norm : norm * -1;
-//             out.origin = pos;
-//             out.direct = rng->sample_hemisphere(abs_norm);
-//             pdf = 1;
-//         } else {
-//             out.origin = pos;
-//             out.direct = reflect(in.direct, norm);
-//             pdf = 1;
-//         }
-//     }
+        if (rng->get() < _diff) {
+            Vec3f abs_norm = (dot(norm, in.direct) < 0) ? norm : norm * -1;
+            out.origin = pos;
+            out.direct = rng->sample_hemisphere(abs_norm);
+            pdf = 1;
+        } else {
+            out.origin = pos;
+            out.direct = reflect(in.direct, norm);
+            pdf = 1;
+        }
+    }
 
-//     virtual BSDFType get_type() const override { return BSDFType::Lambertian | BSDFType::Specular ; }
+    virtual BSDFType get_type() const override { return BSDFType::Lambertian | BSDFType::Specular ; }
 
-// private:
-//     double _diff;
-// };
+private:
+    double _diff;
+};
 
 #endif 

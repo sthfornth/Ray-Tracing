@@ -208,3 +208,8 @@ const Vec3f Vec3f::Y_AXIS = Vec3f(0, 1, 0);
             res[i] = v1[(i+1)%3] * v2[(i+2)%3] - v1[(i+2)%3] * v2[(i+1)%3];
         return res;
     }
+
+    Vec3f reflect(const Vec3f& in, const Vec3f& norm){
+        Vec3f out = in - norm * ((norm & in) * 2);
+        return out.norm();
+    }

@@ -116,9 +116,48 @@ public:
 		Intersection res = Intersection :: null;
 		for (int i = 0; i < mesh.size(); ++i)
 			res = min(res, mesh[i]->intersect(ray));
+        res.object = this;
 		return res;
 	}
-	void read(const char* path);
+	void read(const char* path, Vec3f scale = Vec3f(1, 1, 1), Vec3f shift = Vec3f::ZERO);
+};
+
+class BBox : public Object  //Bounding Box
+{
+public:
+    BBox(Mesh* mesh): mesh(mesh){
+        vmax = Vec3f(-INF, -INF, -INF);
+        vmin = Vec3f(INF, INF, INF);
+        for (auto i : mesh->mesh)
+            for (int j = 0; j < 3; ++j){
+                vmax[j] = max(vmax[j], max(i->a[j], max(i->b[j], i->c[j])));
+                vmin[j] = min(vmin[j], min(i->a[j], min(i->b[j], i->c[j])));
+            }
+    }
+    ~BBox();
+    Mesh* mesh;
+    Vec3f vmax, vmin;
+    virtual Intersection intersect(const Ray& ray){
+        if(!is_intersect(ray))
+            return Intersection::null;
+        return mesh->intersect(ray);
+    }
+
+    inline bool is_intersect(const Ray &ray) {
+        Vec3f result_min = vmin - ray.origin;
+        Vec3f result_max = vmax - ray.origin;
+        result_min = result_min / (ray.direct + EPS);
+        result_max = result_max / (ray.direct + EPS);
+        for (int i = 0; i < 3; ++i)
+            if (result_min[i] > result_max[i])
+                swap(result_min[i], result_max[i]);
+        double near = result_min[0], far = result_max[0];
+        for (int i = 1; i < 3; ++i){
+            near = max(near, result_min[i]);
+            far = min(far, result_max[i]);
+        }
+        return !(near > far || far < 0);
+    }
 };
 
 class Quad: public Object

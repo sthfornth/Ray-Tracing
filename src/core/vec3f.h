@@ -60,16 +60,15 @@ public:
     Vec3f operator -() const;
 
 public:
+    // Vec3f vecMax();
+    // Vec3f vecMin();
     void Normalize();
     Vec3f norm() const;
     double L2Norm_Sqr() const;
     void prt() const{
         printf("%lf %lf %lf\n", x,y,z);
     }
-    Vec3f refelct(const Vec3f& in, const Vec3f& norm){
-        Vec3f out = in + norm * ((norm & in) * 2);
-        return out;
-    }
+    
  
 public:
     union

@@ -7,7 +7,6 @@
 
 #include "common.h"
 #include "vec3f.h"
-#include <opencv2/opencv.hpp>
 
 class Canvas {
 public:

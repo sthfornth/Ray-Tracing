@@ -11,7 +11,7 @@ Intersection Scene::intersect(const Ray &ray){
     return res;
 }
 
-void Mesh::read(const char* path){
+void Mesh::read(const char* path, Vec3f scale, Vec3f shift){
     FILE* fp = fopen(path, "r");
     if (fp == NULL){
         printf("File not exists\n");
@@ -43,6 +43,7 @@ void Mesh::read(const char* path){
 			double x, y, z;  
 			fscanf(fp, "%lf %lf %lf", &x, &y, &z);  
 			Vec3f pos(x, y, z);
+			pos = pos * scale + shift;
 			pSet.push_back(pos);
 		}else if (type[0] == 'f'){  
 			int a, b, c, n = pSet.size();

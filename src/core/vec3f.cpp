@@ -172,6 +172,16 @@ const Vec3f Vec3f::Y_AXIS = Vec3f(0, 1, 0);
 //////////////////////////////////////////////////////////////////////////
 // Other Methods
 
+    // Vec3f Vec3f::vecMax()
+    // {
+    //     return max(x, max(y, z));
+    // }
+
+    // Vec3f Vec3f::vecMin()
+    // {
+    //     return min(x, min(y, z));
+    // }
+
     void Vec3f::Normalize()
     {
         double fSqr = L2Norm_Sqr();

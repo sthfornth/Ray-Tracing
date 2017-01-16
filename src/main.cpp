@@ -42,7 +42,7 @@ void make_scene0(Scene* scene, Camera* &camera){
     Object *rightWall = new Quad(expand(v100, 0, -0.1), expand(v101, 0, -0.1), expand(v111, 0, -0.1), expand(v110, 0, -0.1));
 
     floorWall->set_material(new SimpleMaterial(
-        new LambertianBRDF(new ConstantTexture(Vec3f(0.75, 0.75, 0.75)))
+        new SpecularBRDF(new ConstantTexture(Vec3f(0.75, 0.75, 0.75)))
     ))->add_to_scene(scene);
     ceilWall->set_material(new SimpleMaterial(
         new LambertianBRDF(new ConstantTexture(Vec3f(0.75, 0.75, 0.75)))
@@ -57,7 +57,10 @@ void make_scene0(Scene* scene, Camera* &camera){
         new LambertianBRDF(new ConstantTexture(Vec3f(0.25, 0.25, 0.75)))
     ))->add_to_scene(scene);
 
+    camera = new Camera(Vec3f(0.1, 0.1, 100.0), Vec3f(0, 0, -1).norm(), Vec3f(-1, 0, 0), 15);
+}
 
+void make_scene1(Scene* scene, Camera* &camera){
     Object *sphere1 = new Sphere(Vec3f( 0.0, -7.0,  0.0), 3.0);
     Object *sphere2 = new Sphere(Vec3f(-5.0, -7.0, -5.0), 3.0);
     Object *sphere3 = new Sphere(Vec3f( 7.0, -7.0,  5.0), 3.0);
@@ -79,13 +82,9 @@ void make_scene0(Scene* scene, Camera* &camera){
     //ObjKDTree *kitten_kd = new ObjKDTree(kitten);
     //kitten_kd->add_to_scene(scene);
 
-
-
-    camera = new Camera(Vec3f(0.1, 0.1, 100.0), Vec3f(0, 0, -1).norm(), Vec3f(-1, 0, 0), 15);
-
 }
 
-void make_scene1(Scene* scene, Camera* &camera){
+void make_scene2(Scene* scene, Camera* &camera){
 	Mesh* mesh = new Mesh();
 	mesh->read("cornell_box.obj");
 	scene->add(mesh);
@@ -95,10 +94,14 @@ void make_scene1(Scene* scene, Camera* &camera){
     camera = new Camera(Vec3f(277, 272, -400), Vec3f(0, 0, 1), Vec3f(1, 0, 0), 60);
 }
 
-void make_scene2(Scene* scene, Camera* &camera){
+void make_scene3(Scene* scene, Camera* &camera){
     Mesh* mesh = new Mesh();
-    mesh->read(".obj");
-    scene->add(mesh);
+    mesh->read("arma.obj", Vec3f(7, 7, 7), Vec3f(2, -2, 7));
+    mesh->set_material(new SimpleMaterial(
+        new PhongBRDF(new ConstantTexture(Vec3f(0.75, 0.75, 0.25)))
+    ));
+    BBox* box = new BBox(mesh);
+    box->add_to_scene(scene);
 }
 
 int main()
@@ -106,17 +109,18 @@ int main()
 
 	Camera* camera = new Camera();
     Scene* scene = new Scene();
-	make_scene2(scene, camera);
+    make_scene0(scene, camera);
+	make_scene3(scene, camera);
 	int h = 300, w = 300;
-	Canvas* canvas = new Canvas(h, w, 3);
 
-	//Render* render = new DepthRender(scene);
-	int Times;
-	scanf("%d", &Times);
-	Render* render = new PathTracingRender(scene, Times);
+    int T_D;
+    scanf("%d", &T_D);
+	Canvas* canvas = new Canvas(h, w, 3);
+	// Render* render = new DepthRender(scene, T_D);
+	Render* render = new PathTracingRender(scene, T_D);
 	render->render(camera, canvas);
 	canvas->show("yeah");
-	canvas->write("pt3.jpg");
+	canvas->write("pt5.jpg");
 
 	return 0;
 }

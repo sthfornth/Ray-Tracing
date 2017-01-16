@@ -19,14 +19,16 @@ public:
 
 class DepthRender : public Render{
 public:
-	DepthRender(Scene *scene): Render(scene){}
+	double stD = 200;
+	DepthRender(Scene *scene, double stD = 200): Render(scene), stD(stD){}
 	virtual void render(Camera *camera, Canvas *canvas){
 		int h = canvas->h, w = canvas->w;
 		for (int i = 0; i < h; ++i)
 			for (int j = 0; j < w; ++j){
 				Ray ray = camera->generate(double(i)/(h-1), double(j)/(w-1));
 				Intersection inter = scene->intersect(ray);
-				uint8 color = int(255 / max(inter.distance / 200, 1.0));
+				uint8 color = int(255 / max(inter.distance / stD, 1.0));
+				// printf("%lf\n", inter.distance);
 				for (int k = 0; k < 3; ++k)
 					canvas->set(i,j,k,color);
 			}

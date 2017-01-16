@@ -18,13 +18,29 @@ public:
     	double r2 = get();
     	double r = sqrt(r2);
     	double w = get();	//angle
-    	Vec3f x = norm.x < -0.1 || norm.x > 0.1 ? Vec3f(0, 1, 0): Vec3f(1, 0, 0);
+    	Vec3f x = norm.x < -0.1 || norm.x > 0.1 ? Vec3f::Y_AXIS : Vec3f::X_AXIS;
     	Vec3f u = cross(x, norm).norm();
     	Vec3f v = cross(norm, u);
     	Vec3f res = u * (r * cos(w * 2 * PI)) + v * (r * sin(w * 2 * PI)) + norm * sqrt(1 - r2);
         return res.norm();
     }
 
+    Ray sample_disk(const Vector &center, double r, const Vector &norm) {
+        double r0 = sqrt(get());
+        double r1 = get() * (2.0 * pi);
+        double rx = r * r0 * cos(r1);
+        double ry = r * r0 * sin(r1);
+
+        Vector w = norm;
+        Vector wo = w.x < -0.1 || w.x > 0.1 ? Vec3f::Y_AXIS : Vec3f::X_AXIS;
+        Vector u = cross(wo, w).norm();
+        Vector v = cross(w, u);
+
+        Ray result;
+        result.origin = center + u * rx + v * ry;
+        result.direct = norm;
+        return result;
+    }
 };
 
 class LCGStream : public RandomStream {

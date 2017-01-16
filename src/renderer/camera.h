@@ -33,4 +33,29 @@ public:
 	double fov_scale;
 };
 
+class DoFCamera : public Camera {
+public:
+    double fov, fov_scale, lens_r, focus_distance;
+
+    DoFCamera(void) { }
+
+    DoFCamera(const Vec3f &e, const Vec3f &f, const Vec3f &u, double fov_, double lens_r_, double focus_distance_) {
+        eye = e, front = f, up = u, right = cross(f, u);
+        fov = fov_, fov_scale = tan(fov_ * 0.5 * pi / 180) * 2;
+        lens_r = lens_r_, focus_distance = focus_distance_;
+    }
+
+    inline virtual Ray generate(double x, double y, RandomStream *rng) {
+        Vec3f r = right * ((x - 0.5) * fov_scale);
+        Vec3f u = up * ((y - 0.5) * fov_scale);
+        Ray center_ray = Ray(eye, (front + r + u).norm());
+        Ray disk_ray = rng->sample_disk(eye, lens_r, front);
+//        disk_ray.direct = center_ray.direct;
+        Vec3f look_at = center_ray.origin + center_ray.direct * focus_distance / dot(center_ray.direct, front);
+        disk_ray.direct = (look_at - disk_ray.origin).norm();
+        return disk_ray;
+    }
+};
+
+
 #endif

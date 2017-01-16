@@ -16,11 +16,11 @@ void make_scene0(Scene* scene, Camera* &camera){
     Vec3f l10( 5.0, 9.99, -5.0);
     Vec3f l11( 5.0, 9.99,  5.0);
     Object *light = new Quad(l00, l10, l11, l01);
-    light->set_light(new SimpleLight(Vec3f(4., 4., 4.)))->add_to_scene(scene);
+    light->set_light(new SimpleLight(Vec3f(9., 9., 9.)))->add_to_scene(scene);
 
     // Vec3f delta(0, 0, 15);
     // Object *lt2 = new Quad(l00 + delta, l10 + delta, l11 + delta, l01 + delta);
-    // lt2->set_light(new SimpleLight(Vec3f(4., 4., 4.)))->add_to_scene(scene);
+    // lt2->set_light(new SimpleLight(Vec3f(9., 9., 9.)))->add_to_scene(scene);
 
     // delta = delta * 2;
     // Object *lt3 = new Quad(l00 + delta, l10 + delta, l11 + delta, l01 + delta);
@@ -74,14 +74,6 @@ void make_scene1(Scene* scene, Camera* &camera){
         new RefractiveBTDF(new ConstantTexture(Vec3f(0.999, 0.999, 0.999)), 1.5)
     ))->add_to_scene(scene);
 
-    // ifstream kitten_f("models/kitten.50k.obj", ios::in);
-    // TriangleMesh *kitten = TriangleMesh::from_stream(
-    //    kitten_f, new SimpleMaterial(new RefractiveBTDF(new ConstantTexture(Vec3f(0.999, 0.999, 0.999)))),
-    //    Vec3f(0.12, 0.12, 0.12), Vec3f(-1.75, -9.6, 2.5));
-    // kitten_f.close();
-    //ObjKDTree *kitten_kd = new ObjKDTree(kitten);
-    //kitten_kd->add_to_scene(scene);
-
 }
 
 void make_scene2(Scene* scene, Camera* &camera){
@@ -95,8 +87,14 @@ void make_scene2(Scene* scene, Camera* &camera){
 }
 
 void make_scene3(Scene* scene, Camera* &camera){
+
+    Object *sphere = new Sphere(Vec3f(-5.0, -7.0, -5.0), 3.0);
+    sphere->set_material(new SimpleMaterial(
+        new RefractiveBTDF(new ConstantTexture(Vec3f(0.999, 0.999, 0.999)), 1.5)
+    ))->add_to_scene(scene);
+
     Mesh* mesh = new Mesh();
-    mesh->read("arma.obj", Vec3f(7, 7, -7), Vec3f(2, -2, 7));
+    mesh->read("arma.obj", Vec3f(5, 5, -5), Vec3f(5, -6, -7));
     mesh->set_material(new SimpleMaterial(
         new PhongBRDF(new ConstantTexture(Vec3f(0.75, 0.75, 0.25)))
     ));
@@ -106,8 +104,8 @@ void make_scene3(Scene* scene, Camera* &camera){
 
 int main()
 {
-	// Camera* camera = new Camera();
-    Camera* camera = new DoFCamera();
+	Camera* camera = new Camera();
+    // Camera* camera = new DoFCamera();
     Scene* scene = new Scene();
     make_scene0(scene, camera);
 	make_scene3(scene, camera);
@@ -116,11 +114,11 @@ int main()
     int T_D;
     scanf("%d", &T_D);
 	Canvas* canvas = new Canvas(h, w, 3);
-	// Render* render = new DepthRender(scene, T_D);
-	Render* render = new PathTracingRender(scene, T_D);
+	Render* render = new DepthRender(scene, T_D);
+	// Render* render = new PathTracingRender(scene, T_D);
 	render->render(camera, canvas);
 	canvas->show("yeah");
-	canvas->write("pt5.jpg");
+	canvas->write("pt7.jpg");
 
 	return 0;
 }

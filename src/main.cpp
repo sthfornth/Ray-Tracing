@@ -40,7 +40,7 @@ void make_scene0(Scene* scene, Camera* &camera){
     Object *backWall = new Quad(v010, v000, v100, v110);
     Object *leftWall = new Quad(expand(v000, 0, 0.1), expand(v010, 0, 0.1), expand(v011, 0, 0.1), expand(v001, 0, 0.1));
     Object *rightWall = new Quad(expand(v100, 0, -0.1), expand(v101, 0, -0.1), expand(v111, 0, -0.1), expand(v110, 0, -0.1));
-
+    
     floorWall->set_material(new SimpleMaterial(
         new SpecularBRDF(new ConstantTexture(Vec3f(0.75, 0.75, 0.75)))
     ))->add_to_scene(scene);
@@ -48,8 +48,11 @@ void make_scene0(Scene* scene, Camera* &camera){
         new LambertianBRDF(new ConstantTexture(Vec3f(0.75, 0.75, 0.75)))
     ))->add_to_scene(scene);
     backWall->set_material(new SimpleMaterial(
-        new LambertianBRDF(new ConstantTexture(Vec3f(0.75, 0.75, 0.75)))
-    ))->add_to_scene(scene);
+        new LambertianBRDF(new BmpTexture("wall.jpg", Vec3f(-200, -50, 0), Vec3f(1, 0, 0), Vec3f(0, 0, -1), 20, 20, 2.2))))
+    ->add_to_scene(scene);
+    // backWall->set_material(new SimpleMaterial(
+    //     new LambertianBRDF(new ConstantTexture(Vec3f(0.75, 0.75, 0.75)))
+    // ))->add_to_scene(scene);
     leftWall->set_material(new SimpleMaterial(
         new LambertianBRDF(new ConstantTexture(Vec3f(0.75, 0.25, 0.25)))
     ))->add_to_scene(scene);
@@ -94,7 +97,7 @@ void make_scene3(Scene* scene, Camera* &camera){
     ))->add_to_scene(scene);
 
     Mesh* mesh = new Mesh();
-    mesh->read("arma.obj", Vec3f(5, 5, -5), Vec3f(5, -6, -7));
+    mesh->read("arma.obj", Vec3f(5, 5, -5), Vec3f(5, -5.5, -7));
     mesh->set_material(new SimpleMaterial(
         new PhongBRDF(new ConstantTexture(Vec3f(0.75, 0.75, 0.25)))
     ));
@@ -108,17 +111,17 @@ int main()
     // Camera* camera = new DoFCamera();
     Scene* scene = new Scene();
     make_scene0(scene, camera);
-	make_scene3(scene, camera);
+	make_scene1(scene, camera);
 	int h = 300, w = 300;
 
     int T_D;
     scanf("%d", &T_D);
 	Canvas* canvas = new Canvas(h, w, 3);
-	Render* render = new DepthRender(scene, T_D);
-	// Render* render = new PathTracingRender(scene, T_D);
+	// Render* render = new DepthRender(scene, T_D);
+	Render* render = new PathTracingRender(scene, T_D);
 	render->render(camera, canvas);
 	canvas->show("yeah");
-	canvas->write("pt7.jpg");
+	canvas->write("pt10.jpg");
 
 	return 0;
 }
